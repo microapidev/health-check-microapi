@@ -1,0 +1,157 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "API Healthcheck",
+    "description" : "This is an api that monitors the health of other apis and send notifications to subscribers when the status change\n",
+    "version" : "1.0.0"
+  },
+  "externalDocs" : {
+    "description" : "Find out more about Swagger",
+    "url" : "http://swagger.io"
+  },
+  "servers" : [ {
+    "url" : "https://api-healthcheck.herokuapp.com/api/v1",
+    "description" : "SwaggerHub API Auto Mocking"
+  } ],
+  "paths" : {
+    "/services" : {
+      "get" : {
+        "summary" : "Get all services or the service an email subscribes to if subscriber is provided as a request query",
+        "parameters" : [ {
+          "name" : "subscriber",
+          "in" : "query",
+          "description" : "the email to get all subscribed service for",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "All services or the list of service an email subscribes to",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Service"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Add a new service",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Service"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "service successfully added"
+          },
+          "400" : {
+            "description" : "A service with that name exist"
+          }
+        }
+      }
+    },
+    "/subscribe" : {
+      "post" : {
+        "summary" : "Subscribe to a service",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Subscription"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "successfully subscribed to the service"
+          },
+          "400" : {
+            "description" : "the service doesn't exist"
+          }
+        }
+      }
+    },
+    "/unsubscribe" : {
+      "post" : {
+        "summary" : "unsubscribe to a service",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Subscription"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "successfully subscribed to the service"
+          },
+          "400" : {
+            "description" : "the service doesn't exist"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Service" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "boolean"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        }
+      },
+      "Subscription" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ServiceRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "Subscription" : {
+        "description" : "The email to send notification to and the service being subscribed to",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Subscription"
+            }
+          }
+        },
+        "required" : true
+      },
+      "Service" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/ServiceRequest"
+            }
+          }
+        }
+      }
+    }
+  }
+}

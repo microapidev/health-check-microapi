@@ -4,13 +4,13 @@ const {
   sendUpNotification,
   sendDownNotification,
 } = require("./notification");
+const getApiStatus = require("./getApiStatus");
 
 class RequestLoop {
-  constructor(subscribedServices) {
-    this.queue = subscribedServices;
+  constructor(services, updateDbStatus) {
+    this.queue = services;
     this.intervalIds = new Map();
-    this.healthManagement = new HealthManagement();
-    this.sampleStatus = 0;
+    this.healthManagement = new HealthManagement(services, updateDbStatus);
   }
 
   start() {
@@ -34,46 +34,40 @@ class RequestLoop {
   addOne(service) {
     let intervalId = setInterval(() => {
       this.checkHealth(service);
-    }, 5000);
-    this.intervalIds.set(service.name, intervalId);
+    }, 6000);
+    this.intervalIds.set(service.service_name, intervalId);
   }
 
   checkHealth(service) {
-    let status = this.sampleStatus;
-    console.log(`Checking ${service.name}`);
-    this.healthManagement.manageService(service, status);
+    getApiStatus(service.service_url).then((status) => {
+      this.healthManagement.manageService(service, status);
+    });
   }
 }
 
 class HealthManagement {
-  constructor() {
-    this.servicesStatus = new Map();
+  constructor(services, updateDbStatus) {
+    this.servicesStatus = new Map(
+      services.map((service) => [service.service_name, service.service_status])
+    );
+    this.updateDbStatus = updateDbStatus;
   }
 
   manageService(service, status) {
-    let previousStatus = this.servicesStatus.get(service.name);
-    this.servicesStatus.set(service.name, status);
+    let previousStatus = this.servicesStatus.get(service.service_name);
+    this.servicesStatus.set(service.service_name, status);
 
-    if (previousStatus === undefined && status === 0) {
-      sendNotUpNotification(service.name);
+    if (previousStatus === undefined && !status) {
+      sendNotUpNotification(service.service_name);
     } else if (previousStatus !== status) {
-      if (status === 1) {
-        sendUpNotification(service.name);
-      } else if (status === 0) {
-        sendDownNotification(service.name);
+      this.updateDbStatus(service.service_name, status);
+      if (status) {
+        sendUpNotification(service.service_name);
+      } else {
+        sendDownNotification(service.service_name);
       }
     }
   }
 }
-let dummy = [
-  ["comment", "comment url"],
-  ["auth", "auth url"],
-  ["user", "user url"],
-];
-let services = dummy.map(([name, url]) => new Service(name, url));
 
-let loop = new RequestLoop(services);
-loop.start();
-
-setTimeout(() => loop.stopAll(), 20000);
 module.exports = RequestLoop;

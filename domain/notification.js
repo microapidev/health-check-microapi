@@ -1,10 +1,21 @@
 const { getAllSubscribers } = require("../db/index");
+const { send } = require("./mail");
 
 const sendNotification = async (message, serviceName) => {
-  const receipients = await getAllSubscribers(serviceName);
-  receipients.forEach((receipient) =>
-    console.log(`sending ${message} to ${receipient}`)
-  );
+  try {
+    const receipients = await getAllSubscribers(serviceName);
+    receipients.rows.forEach((receipient) => {
+      console.log(`sending ${message} to ${receipient.subscriber_email}`);
+      send(
+        message,
+        receipient.subscriber_email,
+        "Health Notification",
+        "API Healthcheck"
+      );
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const sendNotUpNotification = (name) =>
