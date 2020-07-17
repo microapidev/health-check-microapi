@@ -1,0 +1,36 @@
+{
+  "name": "api-health",
+  "version": "1.0.0",
+  "description": "A microservice for monitoring the health of microservices",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./app.js",
+    "test": "NODE_ENV=test jest --verbose",
+    "lint": "eslint \"./**/*.js\"",
+    "lint:fix": "eslint --fix \"./**/*.js\""
+  },
+  "keywords": [
+    "microservice",
+    "microapi"
+  ],
+  "author": "Justice League HNGi7 Team",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "googleapis": "^54.0.0",
+    "node-fetch": "^2.6.0",
+    "nodemailer": "^6.4.10",
+    "pg": "^8.3.0",
+    "swagger-ui-express": "^4.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^7.4.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "^26.1.0",
+    "prettier": "^2.0.5"
+  }
+}
