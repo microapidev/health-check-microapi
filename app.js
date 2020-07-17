@@ -21,11 +21,7 @@ getAllServices()
     app.use("/api/v1/services", serviceRoute(mainLoop));
     app.use("/api/v1/subscribe", subscribeRoute);
     app.use("/api/v1/unsubscribe", unsubscribeRoute);
-    app.use(
-      "/api/v1/documentation",
-      swaggerUi.serve,
-      swaggerUi.setup(swaggerDocument)
-    );
+    app.use("/api/v1", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     app.use("/", express.static("home"));
 
     app.use((req, res, next) =>
